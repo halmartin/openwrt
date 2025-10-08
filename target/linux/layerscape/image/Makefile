@@ -54,6 +54,17 @@ define Build/ls-append-sdhead
 	dd if=$(STAGING_DIR_IMAGE)/$(1)-sdcard-head.img >> $@
 endef
 
+define Build/wg-fit-ls1043
+    ./mkits-multiple-config.sh -o $@.its -A $(LINUX_KARCH) \
+	-v $(LINUX_VERSION) -k $@ -a $(KERNEL_LOADADDR) \
+	-e $(if $(KERNEL_ENTRY),$(KERNEL_ENTRY),$(KERNEL_LOADADDR)) \
+	-C gzip -c 1 \
+	-d $(DTS_DIR)/freescale/fsl-ls1043a-rdb.dtb \
+	-D "LS1043RDB" -n "ls1043rdb" -a $(FDT_LOADADDR) -c 1 ;\
+	PATH=$(LINUX_DIR)/scripts/dtc:$(PATH) mkimage -f $@.its $@.new
+	@mv -f $@.new $@
+endef
+
 define Build/traverse-fit-ls1088
     ./mkits-multiple-config.sh -o $@.its -A $(LINUX_KARCH) \
 	-v $(LINUX_VERSION) -k $@ -a $(KERNEL_LOADADDR) \

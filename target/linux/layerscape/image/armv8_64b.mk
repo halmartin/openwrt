@@ -25,6 +25,18 @@ define Device/fsl-sdboot
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 endef
 
+define Device/FitImage
+	KERNEL_SUFFIX := -uImage.itb
+	KERNEL = kernel-bin | gzip | fit gzip $$(KDIR)/image-$$(DEVICE_DTS).dtb
+	KERNEL_NAME := Image
+endef
+
+define Device/FitImageLzma
+	KERNEL_SUFFIX := -uImage.itb
+	KERNEL = kernel-bin | lzma | fit lzma $$(KDIR)/image-$$(DEVICE_DTS).dtb
+	KERNEL_NAME := Image
+endef
+
 define Device/fsl_ls1012a-frdm
   DEVICE_VENDOR := NXP
   DEVICE_MODEL := FRDM-LS1012A
@@ -160,6 +172,31 @@ define Device/fsl_ls1043a-rdb
     append-rootfs | pad-rootfs | check-size
 endef
 TARGET_DEVICES += fsl_ls1043a-rdb
+
+define Device/watchguard-ls1043a
+  $(Device/FitImage)
+  DEVICE_VENDOR := WatchGuard
+  DEVICE_MODEL := Firebox T20/T40
+  DEVICE_DTS := fsl-ls1043a-rdb
+  DEVICE_VARIANT := Default
+  SOC := ls1043a
+  DEVICE_PACKAGES += \
+    kmod-ahci-qoriq \
+    kmod-hwmon-ina2xx \
+    kmod-hwmon-lm90 \
+    kmod-fs-ext4 kmod-sata-ahci kmod-usb3 block-mount kmod-scsi-core kmod-lib-ahci \
+    kmod-libata kmod-leds-gpio kmod-hwmon-core kmod-rtc-ds1307
+  # FILESYSTEMS := squashfs
+  KERNEL_LOADADDR := 0x82000000
+  KERNEL_ENTRY_POINT := 0x82000000
+  # FDT_LOADADDR := 0x90000000
+  KERNEL_SUFFIX := -kernel.itb
+  # IMAGES := sysupgrade.bin
+  # KERNEL := kernel-bin | gzip | traverse-fit-ls1088 gzip $$(DTS_DIR)/$$(DEVICE_DTS).dtb $$(FDT_LOADADDR)
+  KERNEL := kernel-bin | gzip | wg-fit-ls1043 gzip $$(DTS_DIR)/$$(DEVICE_DTS).dtb $$(FDT_LOADADDR)
+  # IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+endef
+TARGET_DEVICES += watchguard-ls1043a
 
 define Device/fsl_ls1043a-rdb-sdboot
   $(Device/rework-sdcard-images)
