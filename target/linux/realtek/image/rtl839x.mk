@@ -9,6 +9,13 @@ define Device/d-link_dgs-1210-52
 endef
 TARGET_DEVICES += d-link_dgs-1210-52
 
+define Device/datto_e24v3
+  $(Device/datto)
+  SOC := rtl8396
+  DEVICE_MODEL := E24v3
+endef
+TARGET_DEVICES += datto_e24v3
+
 define Device/hpe_1920-48g
   $(Device/hpe_1920)
   SOC := rtl8393
