@@ -24,6 +24,13 @@ define Device/edgecore_ecs4100-12ph
 endef
 TARGET_DEVICES += edgecore_ecs4100-12ph
 
+define Device/datto_e24v3
+  $(Device/datto)
+  SOC := rtl8396
+  DEVICE_MODEL := E24v3
+endef
+TARGET_DEVICES += datto_e24v3
+
 define Device/hpe_1920-48g
   $(Device/hpe_1920)
   SOC := rtl8393

@@ -91,6 +91,22 @@ define Device/d-link_dgs-1210-28p-f
 endef
 TARGET_DEVICES += d-link_dgs-1210-28p-f
 
+define Device/datto_l8
+  $(Device/datto)
+  SOC := rtl8380
+  DEVICE_MODEL := L8
+  DEVICE_PACKAGES += realtek-poe kmod-hwmon-lm63
+endef
+TARGET_DEVICES += datto_l8
+
+define Device/datto_e48
+  $(Device/datto)
+  SOC := rtl8393
+  DEVICE_MODEL := E48
+  DEVICE_PACKAGES += realtek-poe kmod-hwmon-lm63
+endef
+TARGET_DEVICES += datto_e48
+
 define Device/engenius_ews2910p-v1
   $(Device/engenius_ews2910p)
   SOC := rtl8380
