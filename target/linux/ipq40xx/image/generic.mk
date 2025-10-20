@@ -825,6 +825,14 @@ define Device/meraki_z3
 endef
 TARGET_DEVICES += meraki_z3
 
+define Device/meraki_z3c
+       $(call Device/meraki_common)
+       DEVICE_MODEL := Z3C
+       DEVICE_DTS_CONFIG := config@3
+       DEVICE_PACKAGES := -ath10k-firmware-qca9887-ct ipq-wifi-meraki_z3
+endef
+TARGET_DEVICES += meraki_z3c
+
 define Device/meraki_gx20
 	$(call Device/meraki_common)
 	DEVICE_MODEL := GX20
