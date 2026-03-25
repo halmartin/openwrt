@@ -17,6 +17,7 @@ DEVICE_VARS += \
         H3C_DEVICE_ID \
         H3C_PRODUCT_ID \
 	LINKSYS_HEADER \
+	UIMAGE_NAME \
         ZYXEL_VERS
 
 define Build/rt-compress

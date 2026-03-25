@@ -21,6 +21,13 @@ d-link,dgs-1210-28p-f|d-link,dgs-1210-28mp-f)
 	# Execute one time after initial flash (instead of waiting 5 min for cron)
 	/sbin/fan_ctrl.sh
 	;;
+datto,e8)
+	# Enable fan control
+	FAN_CTRL='/sys/class/hwmon/hwmon1'
+	echo 1 > "$FAN_PATH/pwm1_enable"
+	# set fan to full speed
+	echo 255 > "$FAN_PATH/pwm1"
+	;;
 esac
 
 exit 0

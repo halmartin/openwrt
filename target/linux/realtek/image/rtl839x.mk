@@ -24,12 +24,29 @@ define Device/edgecore_ecs4100-12ph
 endef
 TARGET_DEVICES += edgecore_ecs4100-12ph
 
-define Device/datto_e24v3
-  $(Device/datto)
+define Device/datto_e24
+  $(Device/uimage-rt-loader)
   SOC := rtl8396
-  DEVICE_MODEL := E24v3
+  DEVICE_MODEL := E24
+  DEVICE_ALT0_VENDOR := Open Mesh
+  DEVICE_ALT0_MODEL := S24v3
+  DEVICE_PACKAGES += realtek-poe kmod-hwmon-lm63
+  UIMAGE_MAGIC := 0x00702202
+  IMAGE_SIZE := 13504k
 endef
-TARGET_DEVICES += datto_e24v3
+TARGET_DEVICES += datto_e24
+
+define Device/datto_e48
+  $(Device/uimage-rt-loader)
+  SOC := rtl8393
+  DEVICE_MODEL := E48
+  DEVICE_ALT0_VENDOR := Open Mesh
+  DEVICE_ALT0_MODEL := S48
+  DEVICE_PACKAGES += realtek-poe kmod-hwmon-lm63
+  UIMAGE_MAGIC := 0x00702201
+  IMAGE_SIZE := 13504k
+endef
+TARGET_DEVICES += datto_e48
 
 define Device/hpe_1920-48g
   $(Device/hpe_1920)

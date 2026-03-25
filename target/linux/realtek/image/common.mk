@@ -44,9 +44,9 @@ define Device/datto
   KERNEL_INITRAMFS := \
 	kernel-bin | \
 	append-dtb | \
-	libdeflate-gzip | \
-	uImage gzip -n 'IMG-01.03.25'
-  UIMAGE_MAGIC := 0x00702201
+	rt-compress | \
+	rt-loader | \
+	uImage none -n 'IMG-00.00.00'
 endef
 
 # The "IMG-" uImage name allows flashing the iniramfs from the vendor Web UI.

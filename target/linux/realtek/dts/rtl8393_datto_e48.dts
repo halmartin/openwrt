@@ -1,16 +1,115 @@
 // SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/leds/common.h>
 #include "rtl839x.dtsi"
-#include "rtl83xx_d-link_dgs-1210_common.dtsi"
-#include "rtl83xx_d-link_dgs-1210_gpio.dtsi"
-#include "rtl83xx_d-link_dgs-1210_gpio_sfp.dtsi"
 
 / {
 	compatible = "datto,e48", "realtek,rtl8393-soc";
 	model = "Datto E48";
 
+	aliases {
+		led-boot = &led_power;
+		led-failsafe = &led_power;
+		led-running = &led_power;
+		led-upgrade = &led_power;
+	};
+
 	memory@0 {
+		device_type = "memory";
 		reg = <0x0 0x10000000>;
+	};
+
+	leds: leds {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinmux_disable_sys_led>;
+		compatible = "gpio-leds";
+
+		led_power: led-0 {
+			function = LED_FUNCTION_POWER;
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio0 0 GPIO_ACTIVE_LOW>;
+		};
+
+		led_poe_max: led-1 {
+			function = LED_FUNCTION_FAULT;
+			color = <LED_COLOR_ID_AMBER>;
+			gpios = <&gpio0 19 GPIO_ACTIVE_LOW>;
+		};
+
+		led_fault: led-2 {
+			function = LED_FUNCTION_FAULT;
+			color = <LED_COLOR_ID_AMBER>;
+			gpios = <&gpio1 2 GPIO_ACTIVE_LOW>;
+		};
+
+		/* low: LAN, high: POE */
+		led_mode: led-3 {
+			function = LED_FUNCTION_STATUS;
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio1 4 GPIO_ACTIVE_LOW>;
+		};
+	};
+
+	keys {
+		compatible = "gpio-keys";
+
+		reset {
+			label = "reset";
+			gpios = <&gpio0 18 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_RESTART>;
+		};
+
+		mode {
+			label = "mode";
+			gpios = <&gpio0 17 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_LIGHTS_TOGGLE>;
+		};
+	};
+
+	gpio-restart {
+		compatible = "gpio-restart";
+		gpios = <&gpio1 0 GPIO_ACTIVE_LOW>;
+		open-source;
+	};
+
+	/* LM63 */
+	i2c-gpio-2 {
+		compatible = "i2c-gpio";
+		sda-gpios = <&gpio0 14 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+		scl-gpios = <&gpio0 13 GPIO_ACTIVE_HIGH>;
+		i2c-gpio,delay-us = <2>;
+		i2c-gpio,scl-open-drain; /* should be replaced by i2c-gpio,scl-has-no-pullup in kernel 6.6 */
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		lm63@4c {
+			compatible = "national,lm63";
+			reg = <0x4c>;
+		};
+	};
+};
+
+&uart1 {
+	status = "okay";
+};
+
+&mdio_aux {
+	status = "okay";
+
+	gpio1: expander@3 {
+		compatible = "realtek,rtl8231";
+		reg = <3>;
+
+		gpio-controller;
+		#gpio-cells = <2>;
+		gpio-ranges = <&gpio1 0 0 37>;
+
+		led-controller {
+			compatible = "realtek,rtl8231-leds";
+			status = "disabled";
+		};
 	};
 };
 
@@ -76,10 +175,12 @@
 	EXTERNAL_PHY(47)
 
 	/* External phy RTL8214FC */
-	EXTERNAL_SFP_PHY_FULL(48, 0)
-	EXTERNAL_SFP_PHY_FULL(49, 1)
-	EXTERNAL_SFP_PHY_FULL(50, 2)
-	EXTERNAL_SFP_PHY_FULL(51, 3)
+	/*
+	* EXTERNAL_SFP_PHY_FULL(48, 0)
+	* EXTERNAL_SFP_PHY_FULL(49, 1)
+	* EXTERNAL_SFP_PHY_FULL(50, 2)
+	* EXTERNAL_SFP_PHY_FULL(51, 3)
+	*/
 };
 
 &switch0 {
@@ -141,10 +242,12 @@
 		SWITCH_PORT(46, 47, qsgmii)
 		SWITCH_PORT(47, 48, qsgmii)
 
-		SWITCH_PORT(48, 49, qsgmii)
-		SWITCH_PORT(49, 50, qsgmii)
-		SWITCH_PORT(50, 51, qsgmii)
-		SWITCH_PORT(51, 52, qsgmii)
+		/*
+		* SWITCH_PORT(48, 49, qsgmii)
+		* SWITCH_PORT(49, 50, qsgmii)
+		* SWITCH_PORT(50, 51, qsgmii)
+		* SWITCH_PORT(51, 52, qsgmii)
+		*/
 
 		/* CPU-Port */
 		port@52 {
@@ -193,14 +296,10 @@
 				reg = <0x004a0000 0x100000>;
 			};
 			partition@5a0000 {
-				label = "runtime";
-				compatible = "denx,uimage";
-				reg = <0x005a0000 0xd30000>;
-			};
-			partition@12d0000 {
-				label = "runtime2";
-				compatible = "denx,uimage";
-				reg = <0x012d0000 0xd30000>;
+				label = "firmware"; /* runtime */
+				reg = <0x005a0000 0x1a60000>;
+				compatible = "openwrt,uimage", "denx,uimage";
+				openwrt,ih-magic = <0x00702201>;
 			};
 		};
 	};

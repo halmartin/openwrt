@@ -34,25 +34,44 @@
 	};
 
 	keys {
-		compatible = "gpio-keys-polled";
-		poll-interval = <20>;
+		compatible = "gpio-keys";
 
 		reset {
 			label = "reset";
-			gpios = <&gpio1 3 GPIO_ACTIVE_LOW>;
+			gpios = <&gpio0 18 GPIO_ACTIVE_LOW>;
 			linux,code = <KEY_RESTART>;
-			debounce-interval = <100>;
+		};
+
+		mode {
+			label = "mode";
+			gpios = <&gpio0 19 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_LIGHTS_TOGGLE>;
 		};
 	};
 
+	/* LM63 */
+	i2c-gpio-2 {
+		compatible = "i2c-gpio";
+		sda-gpios = <&gpio0 14 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+		scl-gpios = <&gpio0 13 GPIO_ACTIVE_HIGH>;
+		i2c-gpio,delay-us = <2>;
+		i2c-gpio,scl-open-drain; /* should be replaced by i2c-gpio,scl-has-no-pullup in kernel 6.6 */
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		lm63@4c {
+			compatible = "national,lm63";
+			reg = <0x4c>;
+		};
+	};
 };
 
 &mdio_aux {
 	status = "okay";
 
-	gpio1: expander@3 {
+	gpio1: expander@0 {
 		compatible = "realtek,rtl8231";
-		reg = <3>;
+		reg = <0>;
 
 		gpio-controller;
 		#gpio-cells = <2>;
@@ -87,7 +106,7 @@
 				reg = <0x80000 0x10000>;
 			};
 			partition@90000 {
-				label = "sysinfo";
+				label = "u-boot-env2";
 				reg = <0x90000 0x20000>;
 			};
 			partition@a0000 {
@@ -100,15 +119,9 @@
 			};
 			partition@5a0000 {
 				label = "firmware";
-				reg = <0x5a0000 0xd30000>;
+				reg = <0x5a0000 0x1a60000>;
 				compatible = "openwrt,uimage", "denx,uimage";
-				// openwrt,ih-magic = <0x83800000>;
-			};
-			partition@12d0000 {
-				label = "firmware2";
-				reg = <0x12d0000 0xd30000>;
-				compatible = "openwrt,uimage", "denx,uimage";
-				// openwrt,ih-magic = <0x83800000>;
+				openwrt,ih-magic = <0x00702202>;
 			};
 		};
 	};
@@ -144,6 +157,10 @@
 	EXTERNAL_PHY(21)
 	EXTERNAL_PHY(22)
 	EXTERNAL_PHY(23)
+};
+
+&uart1 {
+	status = "okay";
 };
 
 &switch0 {

@@ -46,8 +46,21 @@ dlink_dgs_1250() {
 	echo 57000 > "$path_temp_hwmon/temp1_max_hyst"
 }
 
+datto_common() {
+	path_to_hwmon=/sys/class/hwmon/hwmon1
+	# manual PWM control
+	echo 1 > "$path_to_hwmon/pwm1_enable"
+	# max duty cycle
+	echo 255 > "$path_to_hwmon/pwm1"
+}
+
 boot() {
 	case $(board_name) in
+	datto,e8|\
+	datto,e24v3|\
+	datto,e48)
+		datto_common
+		;;
 	plasmacloud,esx28|\
 	plasmacloud,psx28)
 		plasmacloud_common

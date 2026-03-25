@@ -19,6 +19,18 @@ tplink_sg2xxx_fix_mtdparts() {
 	echo -e "$args" | fw_setenv --script -
 }
 
+# Extend OpenWrt over original dual firmware for more overlay space
+datto_fix_mtdparts() {
+	local args
+	args="flashoffset_linux 0x5a0000\n"
+	args="${args}flashoffset_linux2 0x5a0000\n"
+	args="${args}ssize_linux 0x1a60000\n"
+	args="${args}ssize_linux2 0x1a60000"
+	echo -e "$args" | fw_setenv --script -
+	# set boot to first partition
+	fw_setsys bootpartition 0
+}
+
 platform_check_image() {
 	return 0
 }
@@ -27,6 +39,15 @@ platform_do_upgrade() {
 	local board=$(board_name)
 
 	case "$board" in
+	datto,e8|\
+	datto,l8)
+		datto_fix_mtdparts
+		default_do_upgrade "$1"
+		;;
+	datto,e48)
+		PART_NAME="runtime"
+		default_do_upgrade "$1"
+		;;
 	plasmacloud,esx28|\
 	plasmacloud,mcx3|\
 	plasmacloud,psx8|\
