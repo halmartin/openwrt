@@ -12,6 +12,12 @@ touch /etc/config/ubootenv
 board=$(board_name)
 
 case "$board" in
+	watchguard,firebox-t20|\
+	watchguard,firebox-t20-w|\
+	watchguard,firebox-t40-w|\
+	watchguard,firebox-t40)
+		ubootenv_add_uci_config "/dev/mtd2" "0x0000" "0x2000" "0x1000"
+	;;
 	traverse,ten64)
 		ubootenv_add_uci_config "/dev/mtd3" "0x0000" "0x80000" "0x80000"
 	;;

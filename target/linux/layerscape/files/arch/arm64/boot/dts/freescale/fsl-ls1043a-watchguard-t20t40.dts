@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+// https://github.com/neggles/openwrt/commit/0e2ba8ef96acc7a6c7fcb57319e89563decea333#diff-73fafdd684ce62f3c48c572d7966775d7a9ef262213ecfea4bd6b75c58bc678c
+
+/dts-v1/;
+#include "fsl-ls1043a-watchguard.dtsi"
+
+/ {
+	model = "WatchGuard FireBox T20/T40";
+	compatible = "watchguard,firebox-t20", "watchguard,firebox-t40",
+		     "fsl,ls1043a-rdb", "fsl,ls1043a";
+
+	leds {
+		led_wap_amber: led-4 {
+			color = <LED_COLOR_ID_AMBER>;
+			function = LED_FUNCTION_WLAN;
+			gpios = <&led_gpio 4 GPIO_ACTIVE_LOW>;
+		};
+
+		led_wap_green: led-5 {
+			color = <LED_COLOR_ID_GREEN>;
+			function = LED_FUNCTION_WLAN;
+			gpios = <&led_gpio 5 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "phy0radio";
+		};
+	};
+};
+
+&pcie2 {
+	status = "disabled";
+};
+
+&fman0 {
+	mdio@fd000 {
+		wan1_phy: ethernet-phy@1 {
+			reg = <0x01>;
+			
+   			// AR8035 also used on fsl-ls1028a-kontron-sl28-var1.dts, refer to it too
+			// note that on T40 hw, CLK_25M is not connected
+			// workaround buggy EEE on early AR8035 revisions
+	 		eee-broken-1000t;
+		 	eee-broken-100tx;
+		};
+	};
+};

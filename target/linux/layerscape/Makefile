@@ -9,7 +9,7 @@ BOARDNAME:=NXP Layerscape
 
 KERNEL_PATCHVER:=6.12
 
-FEATURES:=squashfs nand usb pcie gpio fpu ubifs ext4 rootfs-part boot-part
+FEATURES:=squashfs nand usb pcie gpio fpu ubifs ext4 rootfs-part boot-part emmc
 SUBTARGETS:=armv8_64b armv7
 
 define Target/Description

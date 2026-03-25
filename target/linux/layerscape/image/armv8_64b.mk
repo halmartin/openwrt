@@ -161,6 +161,36 @@ define Device/fsl_ls1043a-rdb
 endef
 TARGET_DEVICES += fsl_ls1043a-rdb
 
+define Device/watchguard_firebox-ls1043a-w
+  $(Device/fix-sysupgrade)
+  DEVICE_VENDOR := WatchGuard
+  DEVICE_MODEL := Firebox
+  DEVICE_VARIANT := T20-W/T40-W
+  KERNEL_NAME := Image
+  KERNEL_SUFFIX := -kernel.itb
+  KERNEL_INSTALL := 1
+  DEVICE_DTS_LOADADDR = 0x81f00000
+  FDT_LOADADDR = 0x90000000
+  DEVICE_PACKAGES += \
+    uboot-envtools \
+    kmod-ahci-qoriq \
+    kmod-rtc-s35390a \
+    kmod-tpm-i2c-atmel \
+    kmod-eeprom-at24 \
+    kmod-ath10k \
+    ath10k-firmware-qca988x \
+    wpad-basic-mbedtls
+  DEVICE_DTS := freescale/fsl-ls1043a-watchguard-t20t40-w
+  DEVICE_DTS_DIR = $(LINUX_DIR)/arch/arm64/boot/dts
+  KERNEL := kernel-bin | gzip | fit gzip $$(DTS_DIR)/$$(DEVICE_DTS).dtb
+  KERNEL_INITRAMFS := kernel-bin | gzip | fit gzip $$(DTS_DIR)/$$(DEVICE_DTS).dtb
+  IMAGES = root sysupgrade.bin
+  IMAGE/root = append-rootfs
+  IMAGE/sysupgrade.bin = sysupgrade-tar | append-metadata
+  SUPPORTED_DEVICES := watchguard,firebox-t20-w watchguard,firebox-t40-w
+endef
+TARGET_DEVICES += watchguard_firebox-ls1043a-w
+
 define Device/fsl_ls1043a-rdb-sdboot
   $(Device/rework-sdcard-images)
   $(Device/fsl-sdboot)

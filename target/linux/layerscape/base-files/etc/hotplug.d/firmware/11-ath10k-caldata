@@ -1,0 +1,22 @@
+#!/bin/sh
+
+[ -e /lib/firmware/$FIRMWARE ] && exit 0
+
+. /lib/functions/caldata.sh
+
+board=$(board_name)
+
+case "$FIRMWARE" in
+"ath10k/pre-cal-pci-0001:01:00.0.bin")
+	case "$board" in
+	watchguard,t20-w|\
+	watchguard,t40-w)
+		# caldata_extract_mmc "0:ART" 0x9000 0x2f20
+		ath10k_patch_mac $(macaddr_add "$(cat /sys/class/net/eth0/address)" 3)
+		;;
+	esac
+	;;
+*)
+	exit 1
+	;;
+esac
