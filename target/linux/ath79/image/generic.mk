@@ -2071,6 +2071,22 @@ define Device/meraki_mr16
 endef
 TARGET_DEVICES += meraki_mr16
 
+define Device/meraki_z1-nor
+  SOC = ar9344
+  DEVICE_VENDOR := Meraki
+  DEVICE_MODEL := Z1
+  DEVICE_VARIANT := nor
+  DEVICE_PACKAGES := kmod-usb2 kmod-usb-ledtrig-usbport kmod-owl-loader \
+	kmod-leds-uleds kmod-spi-gpio nu801
+  KERNEL_SIZE := 7808k
+  KERNEL := kernel-bin | append-dtb | lzma | loader-kernel | \
+	    pad-to $$(KERNEL_SIZE)
+  KERNEL_INITRAMFS := $$(KERNEL)
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  SUPPORTED_DEVICES += z1
+endef
+TARGET_DEVICES += meraki_z1-spimod
+
 define Device/mercury_mw4530r-v1
   $(Device/tplink-8mlzma)
   SOC := ar9344
