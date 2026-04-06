@@ -2077,15 +2077,15 @@ define Device/meraki_z1-nor
   DEVICE_MODEL := Z1
   DEVICE_VARIANT := nor
   DEVICE_PACKAGES := kmod-usb2 kmod-usb-ledtrig-usbport kmod-owl-loader \
-	kmod-leds-uleds kmod-spi-gpio nu801
-  KERNEL_SIZE := 7808k
-  KERNEL := kernel-bin | append-dtb | lzma | loader-kernel | \
-	    pad-to $$(KERNEL_SIZE)
-  KERNEL_INITRAMFS := $$(KERNEL)
+	kmod-leds-uleds kmod-spi-gpio
+  # KERNEL_SIZE := 7808k
+  # KERNEL := kernel-bin | append-dtb | lzma | loader-kernel
+  KERNEL_INITRAMFS := kernel-bin | append-dtb | lzma | loader-kernel | uImage none
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  LOADER_TYPE := bin
   SUPPORTED_DEVICES += z1
 endef
-TARGET_DEVICES += meraki_z1-spimod
+TARGET_DEVICES += meraki_z1-nor
 
 define Device/mercury_mw4530r-v1
   $(Device/tplink-8mlzma)
