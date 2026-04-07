@@ -2080,7 +2080,9 @@ define Device/meraki_z1-nor
 	kmod-leds-uleds kmod-spi-gpio
   # KERNEL_SIZE := 7808k
   # KERNEL := kernel-bin | append-dtb | lzma | loader-kernel
-  KERNEL_INITRAMFS := kernel-bin | append-dtb | lzma | loader-kernel | uImage none
+  # https://github.com/openwrt/openwrt/issues/15088 ; doesn't work
+  # KERNEL_INITRAMFS := kernel-bin | append-dtb | lzma -d22 | uImage lzma
+  KERNEL_INITRAMFS := kernel-bin | append-dtb | uImage none
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
   LOADER_TYPE := bin
   SUPPORTED_DEVICES += z1
