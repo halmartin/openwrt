@@ -2082,7 +2082,7 @@ define Device/meraki_z1-nor
   # KERNEL := kernel-bin | append-dtb | lzma | loader-kernel
   # https://github.com/openwrt/openwrt/issues/15088 ; doesn't work
   # KERNEL_INITRAMFS := kernel-bin | append-dtb | lzma -d22 | uImage lzma
-  KERNEL_INITRAMFS := kernel-bin | append-dtb | uImage none
+  KERNEL_INITRAMFS := kernel-bin | append-dtb | lzma | loader-kernel | uImage none
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
   LOADER_TYPE := bin
   SUPPORTED_DEVICES += z1
