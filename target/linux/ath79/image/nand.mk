@@ -348,6 +348,23 @@ define Device/meraki_z1
 endef
 TARGET_DEVICES += meraki_z1
 
+define Device/meraki_z1-nor
+  SOC = ar9344
+  DEVICE_VENDOR := Meraki
+  DEVICE_MODEL := Z1
+  DEVICE_VARIANT := nor
+  DEVICE_PACKAGES := kmod-usb2 kmod-usb-ledtrig-usbport kmod-owl-loader \
+	kmod-leds-uleds kmod-spi-gpio nu801
+  KERNEL_SIZE := 7680k
+  LOADER_TYPE := bin
+  LZMA_TEXT_START := 0x82800000
+  KERNEL := kernel-bin | append-dtb | lzma | loader-kernel | uImage none
+  KERNEL_INITRAMFS := $$(KERNEL)
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  SUPPORTED_DEVICES += z1
+endef
+TARGET_DEVICES += meraki_z1-nor
+
 # fake rootfs is mandatory, pad-offset 129 equals (2 * uimage_header + '\0')
 define Device/netgear_ath79_nand
   DEVICE_VENDOR := NETGEAR

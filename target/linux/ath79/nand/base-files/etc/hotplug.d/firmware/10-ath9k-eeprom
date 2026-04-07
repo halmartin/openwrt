@@ -28,6 +28,15 @@ case "$FIRMWARE" in
 			ath9k_patch_mac $(macaddr_add $(mtd_get_mac_binary_ubi board-config 102) 2)
 		fi
 		;;
+	meraki,z1-nor)
+		. /lib/upgrade/nand.sh
+
+		caldata_extract "art" 0x1000 0x800
+		if [ $? -ne 0 ]; then
+			caldata_extract "origcaldata" 0x1000 0x800
+			ath9k_patch_mac $(macaddr_add $(mtd_get_mac_binary_ubi board-config 102) 2)
+		fi
+		;;
 	*)
 		caldata_die "board $board is not supported yet"
 		;;
@@ -50,6 +59,15 @@ case "$FIRMWARE" in
 		if [ -n "$(nand_find_volume ubi0 caldata)" ]; then
 			caldata_extract_ubi "caldata" 0x15000 0x1000
 		else
+			caldata_extract "origcaldata" 0x15000 01000
+			ath9k_patch_mac $(macaddr_add $(mtd_get_mac_binary_ubi board-config 102) 3)
+		fi
+		;;
+	meraki,z1-nor)
+		. /lib/upgrade/nand.sh
+
+		caldata_extract "art" 0x15000 0x1000
+		if [ $? -ne 0 ]; then
 			caldata_extract "origcaldata" 0x15000 01000
 			ath9k_patch_mac $(macaddr_add $(mtd_get_mac_binary_ubi board-config 102) 3)
 		fi

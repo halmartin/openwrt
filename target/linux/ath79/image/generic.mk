@@ -2071,24 +2071,6 @@ define Device/meraki_mr16
 endef
 TARGET_DEVICES += meraki_mr16
 
-define Device/meraki_z1-nor
-  SOC = ar9344
-  DEVICE_VENDOR := Meraki
-  DEVICE_MODEL := Z1
-  DEVICE_VARIANT := nor
-  DEVICE_PACKAGES := kmod-usb2 kmod-usb-ledtrig-usbport kmod-owl-loader \
-	kmod-leds-uleds kmod-spi-gpio
-  # KERNEL_SIZE := 7808k
-  # KERNEL := kernel-bin | append-dtb | lzma | loader-kernel
-  # https://github.com/openwrt/openwrt/issues/15088 ; doesn't work
-  # KERNEL_INITRAMFS := kernel-bin | append-dtb | lzma -d22 | uImage lzma
-  KERNEL_INITRAMFS := kernel-bin | append-dtb | lzma | loader-kernel | uImage none
-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
-  LOADER_TYPE := bin
-  SUPPORTED_DEVICES += z1
-endef
-TARGET_DEVICES += meraki_z1-nor
-
 define Device/mercury_mw4530r-v1
   $(Device/tplink-8mlzma)
   SOC := ar9344

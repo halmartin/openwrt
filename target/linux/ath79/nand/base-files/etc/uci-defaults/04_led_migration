@@ -4,7 +4,8 @@
 board=$(board_name)
 
 case "$board" in
-meraki,z1)
+meraki,z1|\
+meraki,z1-nor)
 	migrate_leds ":tricolor0=:tricolor"
 	;;
 esac

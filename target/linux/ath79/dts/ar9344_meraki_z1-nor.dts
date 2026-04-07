@@ -7,8 +7,8 @@
 #include <dt-bindings/leds/common.h>
 
 / {
-	compatible = "meraki,z1", "qca,ar9344";
-	model = "Cisco Meraki Z1";
+	compatible = "meraki,z1-nor", "qca,ar9344";
+	model = "Cisco Meraki Z1 nor";
 
 	aliases {
 		led-boot = &led_power_orange;
@@ -98,6 +98,7 @@
 	nand-ecc-algo = "bch";
 	nand-ecc-strength = <4>;
 	nand-ecc-step-size = <512>;
+	nand-is-boot-medium;
 
 	partitions {
 		compatible = "fixed-partitions";
@@ -111,7 +112,7 @@
 		};
 
 		partition@20000 {
-			label = "kernel";
+			label = "nandkernel";
 			reg = <0x20000 0x7e0000>;
 		};
 
@@ -196,15 +197,9 @@
 			};
 
 			partition@50000 {
-				label = "firmware";
-				reg = <0x50000 0x7a0000>;
-				compatible = "denx,uimage";
-			};
-
-			partition@7f0000 {
 				label = "art";
-				reg = <0x7f0000 0x10000>;
-				read-only;
+				reg = <0x50000 0x20000>;
+				// read-only;
 
 				nvmem-layout {
 					compatible = "fixed-layout";
@@ -219,6 +214,12 @@
 						reg = <0x15000 0xeb8>;
 					};
 				};
+			};
+
+			partition@70000 {
+				label = "kernel";
+				reg = <0x70000 0x780000>;
+				compatible = "denx,uimage";
 			};
 		};
 	};
