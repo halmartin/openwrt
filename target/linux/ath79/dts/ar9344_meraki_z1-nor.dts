@@ -43,6 +43,22 @@
 			panic-indicator;
 		};
 	};
+
+	uleds {
+		compatible = "virtual-leds";
+
+		red {
+			color = <LED_COLOR_ID_RED>;
+		};
+
+		green: green {
+			color = <LED_COLOR_ID_GREEN>;
+		};
+
+		blue {
+			color = <LED_COLOR_ID_BLUE>;
+		};
+	};
 };
 
 &ref {
@@ -83,12 +99,17 @@
 		compatible = "pci168c,002a"; /* check the pciid - AR9283 */
 		reg = <0x0000 0 0 0 0>;
 		qca,no-eeprom;
+		nvmem-cells = <&macaddr_board_66 3>;
+		nvmem-cell-names = "mac-address";
 	};
 };
 
 &wmac {
 	status = "okay";
 	qca,no-eeprom;
+
+	nvmem-cells = <&macaddr_board_66 2>;
+	nvmem-cell-names = "mac-address";
 };
 
 &nand {
@@ -130,6 +151,24 @@
 		partition@1000000 {
 			label = "ubi";
 			reg = <0x1000000 0x6fe0000>;
+
+			volumes {
+				ubi-volume-board-config {
+					volname = "board-config";
+
+					nvmem-layout {
+						compatible = "fixed-layout";
+						#address-cells = <1>;
+						#size-cells = <1>;
+
+						macaddr_board_66: macaddr@66 {
+							compatible = "mac-base";
+							reg = <0x66 0x6>;
+							#nvmem-cell-cells = <1>;
+						};
+					};
+				};
+			};
 		};
 
 		partition@7fe0000 {
@@ -145,31 +184,41 @@
 
 	phy0: ethernet-phy@0 {
 		reg = <0>;
-		phy-mode = "rgmii";
+		phy-mode = "rgmii-id";
+		qca,mib-poll-interval = <500>;
 
 		qca,ar8327-initvals = <
 			0x04 0x07600000 /* PORT0 PAD MODE CTRL */
 			0x7c 0x0000007e /* PORT0_STATUS */
 			>;
+			// 0x0c 0x01000000
+			// 0x10 0xc1000000
 	};
 };
 
 &eth0 {
 	status = "okay";
 
+	/* default for ar934x, except for 1000M */
 	pll-data = <0x06000000 0x00000101 0x00001313>;
+
+	nvmem-cells = <&macaddr_board_66 0>;
+	nvmem-cell-names = "mac-address";
+
 	phy-mode = "rgmii-id";
+	phy-handle = <&phy0>;
 
 	fixed-link {
 		speed = <1000>;
 		full-duplex;
 	};
+};
 
-	gmac-config {
-		device = <&gmac>;
-		rgmii-gmac0 = <1>;
-		switch-only-mode = <1>;
-	};
+&eth1 {
+	status = "okay";
+
+	nvmem-cells = <&macaddr_board_66 1>;
+	nvmem-cell-names = "mac-address";
 };
 
 &spi {

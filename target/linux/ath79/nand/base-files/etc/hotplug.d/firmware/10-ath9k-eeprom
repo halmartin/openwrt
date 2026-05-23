@@ -59,7 +59,7 @@ case "$FIRMWARE" in
 		if [ -n "$(nand_find_volume ubi0 caldata)" ]; then
 			caldata_extract_ubi "caldata" 0x15000 0x1000
 		else
-			caldata_extract "origcaldata" 0x15000 01000
+			caldata_extract "origcaldata" 0x15000 0x1000
 			ath9k_patch_mac $(macaddr_add $(mtd_get_mac_binary_ubi board-config 102) 3)
 		fi
 		;;
@@ -68,7 +68,7 @@ case "$FIRMWARE" in
 
 		caldata_extract "art" 0x15000 0x1000
 		if [ $? -ne 0 ]; then
-			caldata_extract "origcaldata" 0x15000 01000
+			caldata_extract "origcaldata" 0x15000 0x1000
 			ath9k_patch_mac $(macaddr_add $(mtd_get_mac_binary_ubi board-config 102) 3)
 		fi
 		;;
