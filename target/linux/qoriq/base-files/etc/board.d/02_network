@@ -15,6 +15,9 @@ wg_set_opt_interface() {
 }
 
 case "$board" in
+adtran,ad3040)
+	ucidef_set_interface_lan "eth0 eth1"
+	;;
 fsl,T4240RDB)
 	ucidef_set_interfaces_lan_wan "eth1" "eth0"
 	;;

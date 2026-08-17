@@ -45,3 +45,19 @@ define Device/watchguard_firebox-m300
   IMAGE/sdcard.img.gz := sdcard-img | libdeflate-gzip
 endef
 TARGET_DEVICES += watchguard_firebox-m300
+
+define Device/adtran_ad3040
+  DEVICE_VENDOR := Adtran
+  DEVICE_MODEL := AD3040
+  DEVICE_DTS := adtran-ad3040
+  DEVICE_DTS_DIR := $(DTS_DIR)/fsl
+  DEVICE_PACKAGES := \
+	kmod-eeprom-at24 kmod-hwmon-ina2xx kmod-hwmon-s35390a kmod-spi-nor
+  # KERNEL := kernel-bin | libdeflate-gzip | fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+  KERNEL := kernel-bin | libdeflate-gzip | fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+  # KERNEL := kernel-bin | fit none $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+  KERNEL_SUFFIX := -fit-uImage.itb
+  IMAGES := sysupgrade.bin
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+endef
+TARGET_DEVICES += adtran_ad3040
