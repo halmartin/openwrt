@@ -29,7 +29,7 @@ endef
 
 define U-Boot/Default
   BUILD_TARGET:=qoriq
-  BUILD_SUBTARGET:=generic
+  BUILD_SUBTARGET:=e6500
   BUILD_DEVICES:=$(1)
   ENV_SIZE:=0x2000
 endef

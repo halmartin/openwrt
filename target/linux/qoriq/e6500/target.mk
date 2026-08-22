@@ -1,0 +1,8 @@
+BOARDNAME:=e6500
+CPU_TYPE:=e6500
+
+define Target/Description
+	Build firmware images for NXP QorIQ boards in the
+	T-Series (T1-T5) aka AMP Series platforms
+	featuring e6500 64-bit Power Architecture cores.
+endef

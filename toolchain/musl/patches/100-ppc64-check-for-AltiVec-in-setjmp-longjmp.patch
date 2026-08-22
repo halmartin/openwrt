@@ -1,0 +1,82 @@
+From 0b6f90a930fcda6df287065d39e6b865428e3c69 Mon Sep 17 00:00:00 2001
+From: Stijn Tintel <stijn@linux-ipv6.be>
+Date: Sat, 27 Nov 2021 04:58:50 +0200
+Subject: [PATCH] ppc64: check for AltiVec in setjmp/longjmp
+
+On machines without AltiVec, the lvx and stvx instructions are not
+supported. Use __hwcap to test if AltiVec is supported.
+
+Fixes SIGILL on PowerPC 64 processors without AltiVec support.
+Runtime-tested on e5500 and e6500.
+
+Signed-off-by: Stijn Tintel <stijn@linux-ipv6.be>
+---
+ src/setjmp/powerpc64/longjmp.s | 13 ++++++++++++-
+ src/setjmp/powerpc64/setjmp.s  | 13 ++++++++++++-
+ 2 files changed, 24 insertions(+), 2 deletions(-)
+
+diff --git a/src/setjmp/powerpc64/longjmp.s b/src/setjmp/powerpc64/longjmp.s
+index 81d45ff6..da7172af 100644
+--- a/src/setjmp/powerpc64/longjmp.s
++++ b/src/setjmp/powerpc64/longjmp.s
+@@ -56,7 +56,17 @@ longjmp:
+ 	lfd 30, 38*8(3)
+ 	lfd 31, 39*8(3)
+ 
+-	# 6) restore vector registers v20-v31
++	# 6) restore vector registers v20-v31 if hardware supports AltiVec
++	mflr 0
++	bl 1f
++	.hidden __hwcap
++	.long __hwcap-.
++1:      mflr 4
++	lwz 5, 0(4)
++	add 4, 4, 5
++	ld 4, 0(4)
++	andis. 4, 4, 0x1000
++	beq 1f
+ 	addi 3, 3, 40*8
+ 	lvx 20, 0, 3 ; addi 3, 3, 16
+ 	lvx 21, 0, 3 ; addi 3, 3, 16
+@@ -70,6 +80,7 @@ longjmp:
+ 	lvx 29, 0, 3 ; addi 3, 3, 16
+ 	lvx 30, 0, 3 ; addi 3, 3, 16
+ 	lvx 31, 0, 3
++1:	mtlr 0
+ 
+ 	# 7) return r4 ? r4 : 1
+ 	mr    3,   4
+diff --git a/src/setjmp/powerpc64/setjmp.s b/src/setjmp/powerpc64/setjmp.s
+index 37683fda..32853693 100644
+--- a/src/setjmp/powerpc64/setjmp.s
++++ b/src/setjmp/powerpc64/setjmp.s
+@@ -69,7 +69,17 @@ __setjmp_toc:
+ 	stfd 30, 38*8(3)
+ 	stfd 31, 39*8(3)
+ 
+-	# 5) store vector registers v20-v31
++	# 5) store vector registers v20-v31 if hardware supports AltiVec
++	mflr 0
++	bl 1f
++	.hidden __hwcap
++	.long __hwcap-.
++1:	mflr 4
++	lwz 5, 0(4)
++	add 4, 4, 5
++	ld 4, 0(4)
++	andis. 4, 4, 0x1000
++	beq 1f
+ 	addi  3, 3, 40*8
+ 	stvx 20, 0, 3 ; addi 3, 3, 16
+ 	stvx 21, 0, 3 ; addi 3, 3, 16
+@@ -83,6 +93,7 @@ __setjmp_toc:
+ 	stvx 29, 0, 3 ; addi 3, 3, 16
+ 	stvx 30, 0, 3 ; addi 3, 3, 16
+ 	stvx 31, 0, 3
++1:	mtlr 0
+ 
+ 	# 6) return 0
+ 	li 3, 0
+-- 
+2.32.0
+

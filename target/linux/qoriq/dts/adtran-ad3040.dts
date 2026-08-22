@@ -219,7 +219,8 @@
 			/* TGEC1 (10G) - eth0 */
 			ethernet@e0000 {
 				phy-handle = <&tg1_phy>;
-				phy-connection-type = "xgmii";
+				phy-connection-type = "2500base-x";
+				//phy-connection-type = "xgmii";
 				sleep = <&rcpm 0x80000000>;
 			};
 
@@ -236,28 +237,33 @@
 			/* DTSEC4 (1G) - eth1 */
 			ethernet@e6000 {
 				phy-handle = <&dtsec4_phy>;
-				phy-connection-type = "rgmii";
+				phy-connection-type = "rgmii-rxid";
 				sleep = <&rcpm 0x10000000>;
 			};
 
 			mdio@fc000 {
 				dtsec4_phy: ethernet-phy@1 {
+					// compatible = "ethernet-phy-ieee802.3-c22";
+					compatible = "ethernet-phy-id004d.d0c0";
 					reg = <0x1>;
 				};
 			};
-
 			mdio@fd000 {
 				tg1_phy: ethernet-phy@2 {
 					compatible = "ethernet-phy-ieee802.3-c45";
+					//compatible = "ethernet-phy-id03a1.b662";
 					reg = <0x2>;
 				};
 			};
 		};
 
-		/* USB DR controller: no valid PHY clock, probe fails */
-		usb@211000 {
+		usb0: usb@210000 {
+			status = "okay";
+		};
+		usb1: usb@211000 {
 			status = "disabled";
 		};
+		/* USB DR controller: no valid PHY clock, probe fails */
 
 		/* No SATA device attached */
 		sata@220000 {

@@ -60,7 +60,9 @@ endef
 define Device/Default
   PROFILES := Default
   DEVICE_DTS := $(subst _,-,$(1))
-  KERNEL_DEPENDS = $$(wildcard $(DTS_DIR)/$$(DEVICE_DTS).dts)
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_DTC_FLAGS := -i$(DTS_DIR)
+  KERNEL_DEPENDS = $$(wildcard ../dts/$$(DEVICE_DTS).dts)
   KERNEL_ENTRY := 0x00000000
   KERNEL_LOADADDR := 0x00000000
   KERNEL := kernel-bin
