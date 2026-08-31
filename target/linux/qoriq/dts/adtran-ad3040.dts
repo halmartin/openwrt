@@ -5,7 +5,7 @@
  * 6.18 kernel, adapted for the Adtran AD3040 board using the device set
  * observed in the vendor (3.12) boot log.
  *
- * Board devices (from vendor boot log):
+ * Board devices:
  *   - 2x FMAN Ethernet MACs: TGEC1 (ethernet@e0000, XGMII, c45 PHY @ xmdio/2)
  *     and DTSEC4 (ethernet@e6000, RGMII, PHY @ mdio/1).  The other two MACs
  *     (TGEC2 @e2000, TGEC3 @e4000) are not populated and are disabled.
@@ -18,40 +18,11 @@
  *   - SPI NOR flash: s25fl256s (32 MiB)
  *   - I2C0: s35390a RTC @0x30 (and an at24 eeprom @0x50)
  *   - I2C1: 2x ina220 power monitors @0x40/0x41
- *   - SD/eMMC (sdhc@114000) - root filesystem
+ *   - SD/eMMC (sdhc@114000) - Adtran root filesystem
  *   - 4x DUART serial ports
  *   - SEC/CAAM crypto, QMAN/BMAN/FMAN DPAA
- *   - No SATA device, no NAND device (both disabled)
+ *   - No SATA device, no NAND device
  *
- * Copyright 2014 Freescale Semiconductor Inc.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *	 notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *	 notice, this list of conditions and the following disclaimer in the
- *	 documentation and/or other materials provided with the distribution.
- *     * Neither the name of Freescale Semiconductor nor the
- *	 names of its contributors may be used to endorse or promote products
- *	 derived from this software without specific prior written permission.
- *
- *
- * ALTERNATIVELY, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") as published by the Free Software
- * Foundation, either version 2 of that License or (at your option) any
- * later version.
- *
- * THIS SOFTWARE IS PROVIDED BY Freescale Semiconductor "AS IS" AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL Freescale Semiconductor BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /include/ "t102xsi-pre.dtsi"
@@ -217,27 +188,22 @@
 
 		fman@400000 {
 			/* TGEC1 (10G) - eth0 */
-			ethernet@e0000 {
+			enet0: ethernet@e0000 {
 				phy-handle = <&tg1_phy>;
-				phy-connection-type = "2500base-x";
-				//phy-connection-type = "xgmii";
 				sleep = <&rcpm 0x80000000>;
 			};
 
-			/* TGEC2 (10G) - not populated */
 			ethernet@e2000 {
 				status = "disabled";
 			};
 
-			/* TGEC3 (10G) - not populated */
 			ethernet@e4000 {
 				status = "disabled";
 			};
 
 			/* DTSEC4 (1G) - eth1 */
-			ethernet@e6000 {
+			enet3: ethernet@e6000 {
 				phy-handle = <&dtsec4_phy>;
-				phy-connection-type = "rgmii-rxid";
 				sleep = <&rcpm 0x10000000>;
 			};
 
@@ -318,3 +284,24 @@
 };
 
 #include "t1023si-post.dtsi"
+
+// these have to go after t1023si-post.dtsi
+// or they will be over-written by the include
+&enet0 {
+	label = "lan1";
+	phy-connection-type = "xgmii";
+	pcs-handle-names = "xfi";
+};
+
+&enet3 {
+	label = "lan2";
+	phy-connection-type = "rgmii";
+};
+
+&dtsec4_phy {
+	compatible = "ethernet-phy-ieee802.3-c22";
+};
+
+&tg1_phy {
+	compatible = "ethernet-phy-ieee802.3-c45";
+};
